@@ -3,6 +3,8 @@ import db from '.'
 import sequelize from "sequelize";
 import { User, Student as StudentT } from "../../types";
 import Lesson from "./Lessons";
+import Review from "./Reviews";
+import CustomPrice from "./CustomPrices";
 
 class Student extends Model {
     declare id: StudentT['id']
@@ -61,5 +63,11 @@ Student.init(
 )
 Student.hasOne(Lesson, {foreignKey: 'student_id'})
 Lesson.belongsTo(Student, { foreignKey: 'student_id' });
+
+Student.hasMany(Review, {foreignKey: 'student_id'})
+Review.belongsTo(Student, { foreignKey: 'student_id' });
+
+Student.hasMany(CustomPrice, {foreignKey: 'student_id'})
+CustomPrice.belongsTo(Student, { foreignKey: 'student_id' });
 
 export default Student

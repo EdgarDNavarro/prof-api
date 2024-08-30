@@ -1,4 +1,4 @@
-import { Currency, Language, LessonStatuses } from "./enums";
+import { Currency, DescriptionType, Language, LessonStatuses } from "./enums";
 
 export type UUUID = `${string}-${string}-${string}-${string}-${string}`
 
@@ -88,3 +88,12 @@ export type Review = {
 }
 
 export type NewReview = Omit<Review, 'id'>
+
+export type TutorDescriptions = {
+    id: UUUID
+    type: DescriptionType
+    content: string
+    tutor_id: Tutor['id']
+}
+
+export type NewTutorDescriptions = Omit<TutorDescriptions, 'id'>

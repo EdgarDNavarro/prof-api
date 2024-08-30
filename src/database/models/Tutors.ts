@@ -3,6 +3,9 @@ import db from '.'
 import sequelize from "sequelize";
 import { User, UUUID } from "../../types";
 import Lesson from "./Lessons";
+import Review from "./Reviews";
+import TutorDescriptions from "./TutorDescriptions";
+import CustomPrice from "./CustomPrices";
 //TODO agregar campo fee para el porcentaje
 class Tutor extends Model {
     declare id: UUUID
@@ -134,7 +137,16 @@ Tutor.init(
     }
 )
 
-Tutor.hasOne(Lesson, {foreignKey: 'tutor_id'})
+Tutor.hasMany(Lesson, {foreignKey: 'tutor_id'})
 Lesson.belongsTo(Tutor, { foreignKey: 'tutor_id' });
+
+Tutor.hasMany(Review, {foreignKey: 'tutor_id'})
+Review.belongsTo(Tutor, { foreignKey: 'tutor_id' });
+
+Tutor.hasMany(TutorDescriptions, {foreignKey: 'tutor_id'})
+TutorDescriptions.belongsTo(Tutor, { foreignKey: 'tutor_id' });
+
+Tutor.hasMany(CustomPrice, {foreignKey: 'tutor_id'})
+CustomPrice.belongsTo(Tutor, { foreignKey: 'tutor_id' });
 
 export default Tutor

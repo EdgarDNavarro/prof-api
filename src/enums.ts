@@ -29,3 +29,10 @@ export enum LessonMinutes {
     MIDDLE_CLASS = 25,
     CLASS = 50
 }
+
+export enum DescriptionType {
+    INTRODUCE_YOURSELF = "introduce_yourself",
+    TEACHING_EXPERIENCE = "teaching_experience",
+    MOTIVATE_STUDENT = "motivate_student",
+    CATCHY_TITLE = "catchy_title"
+}

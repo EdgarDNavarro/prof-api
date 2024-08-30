@@ -4,7 +4,6 @@ import sequelize from "sequelize";
 import { Lesson as LessonT } from "../../types";
 import Tutor from "./Tutors";
 import Student from "./Students";
-import { LessonMinutes, LessonStatuses } from "../../enums";
 
 class Lesson extends Model {
     declare id: LessonT['id']
