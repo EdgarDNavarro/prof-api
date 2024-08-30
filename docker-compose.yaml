@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  backend:
+    build: ./
+    ports:
+      - 3021:3021
+    environment:
+      - DB-USER=root
+      - DB-PASS=
+      - DB-NAME=prof
+      - DB-HOST=db
+      - JWT_SECRET=212121dndndnd
+    volumes:
+      - ./:/app-backend
+    container_name: prof_backend
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASS=
+    restart: always
