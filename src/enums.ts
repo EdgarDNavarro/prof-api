@@ -1,12 +1,12 @@
 export enum Language {
-    es = 'es',
-    it = 'it',
-    pt = 'pt',
-    en = 'en',
-    fr = 'fr',
-    de = 'de',
-    ja = 'ja',
-    zh = 'zh',
+    ES = 'es',
+    IT = 'it',
+    PT = 'pt',
+    EN = 'en',
+    FR = 'fr',
+    DE = 'de',
+    JA = 'ja',
+    ZH = 'zh',
 }
 export enum Currency {
     USD = 'USD',
@@ -35,4 +35,13 @@ export enum DescriptionType {
     TEACHING_EXPERIENCE = "teaching_experience",
     MOTIVATE_STUDENT = "motivate_student",
     CATCHY_TITLE = "catchy_title"
+}
+
+export enum StudentLevel {
+    BEGINNER = "beginner",
+    PRE_BEGINNER = "pre_beginner",
+    INTERMEDIATE = "intermediate",
+    UPPER_INTERMEDIATE = "upper_intermediate",
+    ADVANCED = "advanced",
+    NOT_SPECIFIED = "not_specified",
 }

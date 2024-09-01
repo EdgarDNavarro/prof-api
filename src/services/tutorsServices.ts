@@ -1,4 +1,5 @@
 import Review from "../database/models/Reviews";
+import StudentLevels from "../database/models/StudentLevels";
 import TutorDescriptions from "../database/models/TutorDescriptions";
 import Tutor from "../database/models/Tutors";
 import { NewTutor, UUUID } from "../types";
@@ -14,12 +15,13 @@ export const findTutors = async () : Promise<Tutor[]> => {
 }
 
 export const findTutorsById = async (id: UUUID) : Promise<Tutor | undefined> => {
-    // const tutor = await Tutor.findByPk(id, {include: [
-    //     {model: Review},
-    //     {model: TutorDescriptions}
-    // ]})
+    const tutor = await Tutor.findByPk(id, {include: [
+        {model: Review},
+        {model: TutorDescriptions},
+        {model: StudentLevels},
+    ]})
 
-    const tutor = await Tutor.findByPk(id)
+    // const tutor = await Tutor.findByPk(id)
 
     if(tutor) {
         return tutor

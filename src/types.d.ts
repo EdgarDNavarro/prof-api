@@ -97,3 +97,8 @@ export type TutorDescriptions = {
 }
 
 export type NewTutorDescriptions = Omit<TutorDescriptions, 'id'>
+
+export type NewTutorStudentLevel = {
+    student_level_id: number
+    tutor_id: Tutor['id']
+}
