@@ -13,7 +13,7 @@ export const findStudents = async () : Promise<Student[]> => {
 }
 
 export const findStudentById = async (id: UUUID) : Promise<Student | undefined> => {
-    const student = await Student.findOne({where: {id}})
+    const student = await Student.findByPk(id)
     if(student) {
         return student
     }

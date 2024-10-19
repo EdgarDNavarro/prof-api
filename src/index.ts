@@ -2,10 +2,12 @@ import express, { NextFunction, Request, Response } from 'express'
 import Router from './routes/index'
 import cors from 'cors'
 import { respError } from './utils'
+import cookieParser from 'cookie-parser';
 
 const app = express()
 app.use(express.json())
 app.use(cors())
+app.use(cookieParser());
 
 const PORT = 3021
 
@@ -14,6 +16,7 @@ app.get('/ping', (req, res) => {
     res.send('pong')
 })
 app.use('/api', Router)
+
 app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
     console.error(err); 
 

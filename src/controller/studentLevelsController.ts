@@ -1,15 +1,9 @@
 import { NextFunction, Request, Response } from "express"
-import { validationResult } from "express-validator"
 import { respError, respOk } from "../utils"
 import * as studentLevelsServices from '../services/studentLevelsServices'
 import { NewTutorStudentLevel } from "../types"
 
 export const createTutorStudentLevel = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { student_level_id, tutor_id } = req.body as NewTutorStudentLevel
 
@@ -30,11 +24,6 @@ export const createTutorStudentLevel = async (req: Request, res: Response, next:
 }
 
 export const deleteTutorStudentLevel = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const student_level_id = +req.params.student_level_id as NewTutorStudentLevel['student_level_id']
     const tutor_id = req.params.tutor_id as NewTutorStudentLevel['tutor_id']
@@ -56,13 +45,8 @@ export const deleteTutorStudentLevel = async (req: Request, res: Response, next:
 }
 
 export const getTutorStudentLevels = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
 
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
-    const tutor_id = req.params.tutor_id as NewTutorStudentLevel['tutor_id']
+    const tutor_id = req.params.id as NewTutorStudentLevel['tutor_id']
 
     try {
         const tutorStudentLevels = await studentLevelsServices.findTutorStudentLevels(tutor_id)

@@ -7,18 +7,9 @@ import { LessonStatuses } from "../enums"
 
 
 export const createLesson = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
-    const { scheduled_at, duration_minutos, student_id, tutor_id } = req.body as NewLesson
-
+    const { scheduled_at, duration_minutos, student_id, tutor_id } = req.body
     try {
         const newLesson: NewLesson = { scheduled_at, duration_minutos, student_id, tutor_id }
-    
         const addedLesson = await lessonServices.addLesson(newLesson)
     
         res.json(respOk(addedLesson))
@@ -28,13 +19,6 @@ export const createLesson = async (req: Request, res: Response, next: NextFuncti
 }
 
 export const scheduleLesson = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     const { scheduled_at, id } = req.body as Pick<Lesson, 'id' | 'scheduled_at'>
 
     try {
@@ -55,13 +39,6 @@ export const scheduleLesson = async (req: Request, res: Response, next: NextFunc
 }
 
 export const statusLesson = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     const { status, id } = req.body as Pick<Lesson, 'id' | 'status'>
 
     try {
@@ -90,11 +67,6 @@ export const getLessons = async (req: Request, res: Response, next: NextFunction
 }
 
 export const getLessonById = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     try {
         const id = req.params.id as Lesson['id']
@@ -109,11 +81,6 @@ export const getLessonById = async (req: Request, res: Response, next: NextFunct
 }
 
 export const getLessonsByTutorId = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     try {
         const tutor_id = req.params.id as Lesson['tutor_id']
@@ -126,11 +93,6 @@ export const getLessonsByTutorId = async (req: Request, res: Response, next: Nex
 }
 
 export const getLessonsByStudentId = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     try {
         const student_id = req.params.id as Lesson['student_id']
@@ -143,14 +105,7 @@ export const getLessonsByStudentId = async (req: Request, res: Response, next: N
 }
 
 export const createCustomPrice = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
-    const { price, student_id, tutor_id } = req.body as NewCustomPrice
+    const { price, student_id, tutor_id } = req.body
 
     try {
         const exitsCustomPrice = await lessonServices.findCustomPriceByIds(student_id, tutor_id)
@@ -172,12 +127,6 @@ export const createCustomPrice = async (req: Request, res: Response, next: NextF
 }
 
 export const getCustomPrice = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { student_id, tutor_id } = req.params as Pick<CustomPrice, 'student_id' | 'tutor_id'>
 

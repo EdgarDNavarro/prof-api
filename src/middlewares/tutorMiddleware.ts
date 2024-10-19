@@ -23,10 +23,3 @@ export const EditTutorMiddleware = async (req: Request, res: Response, next: Nex
 
     next()
 }
-
-export const ProfileVisibilityTutorMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    await body("id").not().isEmpty({ignore_whitespace: true}).withMessage("id is required").isUUID().withMessage("That doesn't look like a valid id").run(req)
-    await body("profile_hidden").isBoolean().withMessage("profile_hidden must be of type boolean").not().isEmpty({ignore_whitespace: true}).withMessage("profile_hidden is required").run(req)
-
-    next()
-}

@@ -4,7 +4,7 @@ import { validationResult } from "express-validator";
 import { NewUser, NonPassUser, User, UUUID } from "../types";
 import { respError, respOk } from "../utils";
 import bcrypt from 'bcrypt'
-import { sign } from "../jwt/jwt";
+import { sign, verifyJWT } from "../jwt/jwt";
 
 export const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
     try {
@@ -16,11 +16,6 @@ export const getUsers = async (_req: Request, res: Response, next: NextFunction)
 }
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     try { 
         const id = req.params.id as UUUID
@@ -34,11 +29,6 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 
 export const registry = async (req: Request, res: Response, next: NextFunction) => {
 
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { email, password, language, currency } = req.body as NewUser
 
@@ -60,11 +50,6 @@ export const registry = async (req: Request, res: Response, next: NextFunction) 
 
 export const putLangCurrency = async (req: Request, res: Response, next: NextFunction) => {
 
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { id, language, currency } = req.body as Pick<User, 'id' | 'currency' | 'language' >
 
@@ -84,11 +69,6 @@ export const putLangCurrency = async (req: Request, res: Response, next: NextFun
 
 export const putEmail = async (req: Request, res: Response, next: NextFunction) => {
 
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { id, email } = req.body as Pick<User, 'id' | 'email'>
 
@@ -111,11 +91,6 @@ export const putEmail = async (req: Request, res: Response, next: NextFunction) 
 
 export const putPass = async (req: Request, res: Response, next: NextFunction) => {
 
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     const { id, password, new_password } = req.body 
 
@@ -150,11 +125,6 @@ export const putPass = async (req: Request, res: Response, next: NextFunction) =
 }
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
 
     try {
         const { email, password } = req.body as Pick<User, 'password' | 'email'>
@@ -172,7 +142,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         }
         const { id, confirmed, language, currency, Tutor, Student } = user
     
-        const token = sign({id: user.id, email: user.email})
+        // Generamos el access token con duración corta
+        const accessToken = sign({ id: user.id, email: user.email }, '1h');
+        // Generamos el refresh token con duración más larga
+        const refreshToken = sign({ id: user.id, email: user.email }, '7d');
+
+
         const userData = {
             id,
             email,
@@ -182,9 +157,42 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             Tutor,
             Student
         }
+
+        // Enviamos el refresh token en una cookie HttpOnly
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,     // Evita que sea accesible por JavaScript
+            secure: true,       // Asegúrate de usar HTTPS en producción
+            sameSite: 'strict', // Protege contra ataques CSRF
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+        });
     
-        return res.json(respOk({token, userData: userData}))
+        return res.json(respOk({token: accessToken, userData: userData}))
     } catch (error) {
         next(error)
     }
 }
+
+export const refreshToken = (req: Request, res: Response, next: NextFunction) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).json(respError({ msg: 'No refresh token provided' }));
+    }
+
+    try {
+        // Verificamos la validez del refresh token
+        const decoded = verifyJWT(refreshToken);
+
+        if(typeof decoded === 'string') return res.status(401).json(respError({ msg: 'Invalid refresh token' }));
+
+        // Generamos un nuevo access token
+        const accessToken = sign({ id: decoded.id, email: decoded.email }, '1h');
+
+        return res.json(respOk({ token: accessToken }));
+    } catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json(respError({ msg: 'Refresh token expired' }));
+        }
+        return res.status(401).json(respError({ msg: 'Invalid refresh token' }));
+    }
+};

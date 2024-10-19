@@ -1,17 +1,9 @@
 import { NextFunction, Request, Response } from "express"
-import { validationResult } from "express-validator"
 import { Review, NewReview } from "../types"
 import { respError, respOk } from "../utils"
 import * as reviewsServices from '../services/reviewsServices'
 
 export const createReview = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     const { comment, rating, tutor_id, student_id } = req.body as NewReview
 
     try {
@@ -35,12 +27,6 @@ export const getReviews = async (req: Request, res: Response, next: NextFunction
 }
 
 export const getReviewById = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     try {
         const id = req.params.id as Review['id']
         const review = await reviewsServices.findReviewById(id)
@@ -54,12 +40,6 @@ export const getReviewById = async (req: Request, res: Response, next: NextFunct
 }
 
 export const getReviewsByTutorId = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     try {
         const tutor_id = req.params.id as Review['tutor_id']
         const review = await reviewsServices.findReviewsByTutorId(tutor_id)
@@ -71,13 +51,6 @@ export const getReviewsByTutorId = async (req: Request, res: Response, next: Nex
 }
 
 export const putReview = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     const { id, rating, comment } = req.body as Pick<Review, 'id' | 'rating' | 'comment'>
 
     try {
@@ -97,12 +70,6 @@ export const putReview = async (req: Request, res: Response, next: NextFunction)
 }
 
 export const deleteReview = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     try {
         const id = req.params.id as Review['id']
         const review = await reviewsServices.findReviewById(id)

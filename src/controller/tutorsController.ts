@@ -1,17 +1,9 @@
 import { NextFunction, Request, Response } from "express"
-import { validationResult } from "express-validator"
 import { EditTutor, NewTutor, Tutor } from "../types"
 import { respError, respOk } from "../utils"
 import * as tutorsServices from '../services/tutorsServices'
 
 export const createTutor = async (req: Request, res: Response, next: NextFunction) => {
-
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     const {
         user_id,
         first_name,
@@ -25,7 +17,7 @@ export const createTutor = async (req: Request, res: Response, next: NextFunctio
         video_thumbnail,
         years_of_experience,
         class_price
-    } = req.body as NewTutor
+    } = req.body
 
     try {
         const newTutoData: NewTutor = {
@@ -60,12 +52,6 @@ export const getTutors = async (req: Request, res: Response, next: NextFunction)
 }
 
 export const getTutorsById = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
     try {
         const id = req.params.id as Tutor['id']
         const tutor = await tutorsServices.findTutorsById(id)
@@ -79,11 +65,6 @@ export const getTutorsById = async (req: Request, res: Response, next: NextFunct
 }
 
 export const putTutor = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
     const {
         id,
         first_name,
@@ -98,8 +79,7 @@ export const putTutor = async (req: Request, res: Response, next: NextFunction) 
         years_of_experience,
         class_price,
         profile_hidden
-    } = req.body as EditTutor
-
+    } = req.body
     try {
         const tutor = await tutorsServices.findTutorsById(id)
 
@@ -130,21 +110,14 @@ export const putTutor = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export const profileVisibility = async (req: Request, res: Response, next: NextFunction) => {
-    let result = validationResult(req)
-
-    if(!result.isEmpty()) {
-        return res.json(respError(result.array()))
-    }
-
-    const { id, profile_hidden } = req.body as Pick<Tutor, 'id' | 'profile_hidden'>
-
+    const { id } = req.params as Pick<Tutor, 'id'>
     try {
         const tutor = await tutorsServices.findTutorsById(id)
-
+        
         if(!tutor) {
             return res.status(404).json(respError({msg: "Tutor not found"}))
         }
-        tutor.profile_hidden = profile_hidden
+        tutor.profile_hidden = !tutor.dataValues.profile_hidden
         await tutor.save()
         return res.json(respOk(tutor))
     } catch (error) {

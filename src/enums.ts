@@ -8,6 +8,7 @@ export enum Language {
     JA = 'ja',
     ZH = 'zh',
 }
+
 export enum Currency {
     USD = 'USD',
     EUR = 'EUR',
@@ -21,7 +22,7 @@ export enum Currency {
 export enum LessonStatuses {
     UNSCHEDULED = 'Unscheduled',
     SCHEDULED = 'Scheduled',
-    INPROGRESS = 'In progress',
+    INPROGRESS = 'In_Progress',
     COMPLETED = 'Completed'
 }
 
@@ -44,4 +45,13 @@ export enum StudentLevel {
     UPPER_INTERMEDIATE = "upper_intermediate",
     ADVANCED = "advanced",
     NOT_SPECIFIED = "not_specified",
+}
+
+export enum AgeGroups {
+    PRESCHOOLERS = '4-6',
+    PRIMARY = '6-12',
+    HIGHSCHOOL = '12-17',
+    STUDENTS = '17-22',
+    ADULTS = '23-40',
+    OLDER = '40+'
 }

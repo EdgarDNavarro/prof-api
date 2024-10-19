@@ -21,8 +21,6 @@ export const findTutorsById = async (id: UUUID) : Promise<Tutor | undefined> => 
         {model: StudentLevels},
     ]})
 
-    // const tutor = await Tutor.findByPk(id)
-
     if(tutor) {
         return tutor
     }
