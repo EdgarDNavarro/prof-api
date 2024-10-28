@@ -4,7 +4,8 @@ import { validationResult } from "express-validator";
 import { NewUser, NonPassUser, User, UUUID } from "../types";
 import { respError, respOk } from "../utils";
 import bcrypt from 'bcrypt'
-import { sign, verifyJWT } from "../jwt/jwt";
+import { createConfirmedToken, sign, verifyJWT } from "../jwt/jwt";
+import { AuthEmail } from "../emails/AuthEmail";
 
 export const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
     try {
@@ -28,8 +29,6 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 }
 
 export const registry = async (req: Request, res: Response, next: NextFunction) => {
-
-
     const { email, password, language, currency } = req.body as NewUser
 
     try {
@@ -48,9 +47,38 @@ export const registry = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
+export const confirmAccount = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, token } = req.body
+
+    try {
+        const user = await usersServices.findUserByEmail(email)
+        if(!user) {
+            return res.status(404).json(respError({msg: 'user not found'}))
+        }
+        if(!user.token) {
+            return res.status(404).json(respError({msg: 'token not found'}))
+        }
+        const userToken = verifyJWT(user.token)
+        console.log(userToken);
+        
+        if(!userToken || typeof userToken === 'string' || userToken.otp !== token.toString()) {
+            return res.status(401).json(respError({msg: 'token no valid'}))
+        }
+
+        user.confirmed = true
+        user.token = null
+        user.save()
+        res.json(respOk("Account confirmed"))
+
+    } catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json(respError({msg: 'Token expired'})) 
+        }
+        next(error)
+    }
+}
+
 export const putLangCurrency = async (req: Request, res: Response, next: NextFunction) => {
-
-
     const { id, language, currency } = req.body as Pick<User, 'id' | 'currency' | 'language' >
 
     try {
@@ -141,6 +169,19 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             return res.status(401).json(respError({msg: 'The email or password is incorrect'}))
         }
         const { id, confirmed, language, currency, Tutor, Student } = user
+
+        if(!confirmed) {
+            const { otpToken, otp } = createConfirmedToken()
+            user.token = otpToken
+            await user.save()
+
+            AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                token: otp
+            })
+
+            return res.status(401).json(respError({msg: 'We have sent a confirmation email'}))
+        }
     
         // Generamos el access token con duración corta
         const accessToken = sign({ id: user.id, email: user.email }, '1h');

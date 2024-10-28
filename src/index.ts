@@ -3,11 +3,14 @@ import Router from './routes/index'
 import cors from 'cors'
 import { respError } from './utils'
 import cookieParser from 'cookie-parser';
+import morgan from 'morgan'
+import colors from 'colors'
 
 const app = express()
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser());
+app.use(morgan('dev'))
 
 const PORT = 3021
 
@@ -39,5 +42,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
 })
 
 app.listen(PORT, () => {
-    console.log('Server running on port', PORT)
+    console.log(colors.cyan.bold.italic(`------------------------------`))
+    console.log(colors.cyan.bold.italic(`Server running on port ${PORT}`))
+    console.log(colors.cyan.bold.italic(`------------------------------`))
 })

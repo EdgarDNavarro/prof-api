@@ -20,6 +20,12 @@ export const idMiddleware = async (req: Request, res: Response, next: NextFuncti
 export const UserMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     await body("email").toLowerCase().isEmail().withMessage("that doesn't look like an email").custom(isValidUser).withMessage("This email is already in use").run(req)
     await body("password").not().isEmpty({ignore_whitespace: true}).withMessage("password is required").isStrongPassword({minLength: 8, minUppercase: 1, minLowercase: 1, minSymbols: 1}).withMessage("The password must have at least 8 characters, 1 uppercase, 1 lowercase and 1 symbol").run(req)
+    await body("password_confirmation").custom((value, {req}) => {
+        if(value !== req.body.password) {
+            throw new Error('Los Password no son iguales')
+        }
+        return true
+    }).run(req)
     await body("language").isString().not().isEmpty({ignore_whitespace: true}).withMessage("language is required").custom(async language => {
         parseLanguage(language)
     }).run(req)
@@ -27,6 +33,13 @@ export const UserMiddleware = async (req: Request, res: Response, next: NextFunc
         parseCurrency(language)
     }).run(req)
 
+    next()
+}
+
+export const ConfirmMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    await body("email").toLowerCase().isEmail().withMessage("that doesn't look like an email").run(req)
+    await body("token").notEmpty().withMessage("token is required").run(req)
+  
     next()
 }
 

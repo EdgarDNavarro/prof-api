@@ -43,4 +43,17 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     next();
 }
 
-export { sign, verifyToken, verifyJWT }
+const createConfirmedToken = () => {
+    const expiresIn = '10m'
+    const jwtConfig: SignOptions = {
+        algorithm: 'HS256',
+        expiresIn
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    return {
+        otp,
+        otpToken: jwt.sign({otp}, secret, jwtConfig)
+    }
+}
+
+export { sign, verifyToken, verifyJWT, createConfirmedToken }

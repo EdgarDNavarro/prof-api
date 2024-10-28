@@ -1,4 +1,3 @@
-// src/seed.ts
 import { StudentLevel } from '../../enums';
 import StudentLevels from '../models/StudentLevels';
 import db from '../models/index'

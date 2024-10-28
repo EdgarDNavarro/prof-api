@@ -10,7 +10,7 @@ class User extends Model {
     declare id: UserT['id']
     declare email: UserT['email']
     declare password: UserT['password']
-    declare token?: UserT['token']
+    declare token: UserT['token'] 
     declare confirmed: UserT['confirmed']
     declare language: UserT['language']
     declare currency: UserT['currency']

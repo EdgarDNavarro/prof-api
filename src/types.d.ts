@@ -6,7 +6,7 @@ export type User = {
     readonly id: UUUID;
     email: string;
     password: string;
-    token?: string;
+    token: string | null;
     confirmed: boolean;
     language: Language;
     currency: Currency;
