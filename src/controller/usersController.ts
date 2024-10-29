@@ -29,17 +29,26 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 }
 
 export const registry = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password, language, currency } = req.body as NewUser
+    const { email, password, language, currency } = req.body 
 
     try {
+
+        const { otpToken, otp } = createConfirmedToken()
+
         const newUser: NewUser = {
             email,
             password,
             language,
-            currency 
+            currency,
+            token: otpToken
         }
     
         const addedUser = await usersServices.addUser(newUser)
+
+        AuthEmail.sendConfirmationEmail({
+            email: newUser.email,
+            token: otp
+        })
     
         res.json(respOk(addedUser))
     } catch (error: any) {
@@ -74,6 +83,29 @@ export const confirmAccount = async (req: Request, res: Response, next: NextFunc
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json(respError({msg: 'Token expired'})) 
         }
+        next(error)
+    }
+}
+
+export const requestConfirmationCode = async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body 
+    //TODO: verificar si ya esta confirmado y no mandar email
+    try {
+        const user = await usersServices.findUserByEmail(email)
+        if(!user) {
+            return res.status(404).json(respError({msg: 'user not found'}))
+        }
+        const { otpToken, otp } = createConfirmedToken()
+        user.token = otpToken
+        await user.save()
+
+        AuthEmail.sendConfirmationEmail({
+            email,
+            token: otp
+        })
+    
+        res.json(respOk({msg: 'Se envio el correo'}))
+    } catch (error: any) {
         next(error)
     }
 }
@@ -186,7 +218,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         // Generamos el access token con duración corta
         const accessToken = sign({ id: user.id, email: user.email }, '1h');
         // Generamos el refresh token con duración más larga
-        const refreshToken = sign({ id: user.id, email: user.email }, '7d');
+        const refreshToken = sign({ id: user.id, email: user.email }, '6m');
 
 
         const userData = {
@@ -204,7 +236,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             httpOnly: true,     // Evita que sea accesible por JavaScript
             secure: true,       // Asegúrate de usar HTTPS en producción
             sameSite: 'strict', // Protege contra ataques CSRF
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+            maxAge: 6 * 30 * 7 * 24 * 60 * 60 * 1000 // 6 meses segun yo
         });
     
         return res.json(respOk({token: accessToken, userData: userData}))

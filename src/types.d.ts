@@ -15,7 +15,7 @@ export type User = {
 }
 
 export type NonPassUser = Omit<User, 'password'>
-export type NewUser = Omit<User, 'id' | 'token' | 'confirmed' >
+export type NewUser = Pick<User, 'email' | 'token' | 'password' | 'currency' | 'language' >
 
 export type Student = {
     readonly id: UUUID

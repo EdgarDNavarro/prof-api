@@ -43,6 +43,12 @@ export const ConfirmMiddleware = async (req: Request, res: Response, next: NextF
     next()
 }
 
+export const RequestConfirmMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    await body("email").toLowerCase().isEmail().withMessage("that doesn't look like an email").custom(isValidUser).withMessage("This email is already in use").run(req)
+  
+    next()
+}
+
 export const editLangAndCurrrencyMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     await body("id").not().isEmpty({ignore_whitespace: true}).withMessage("id is required").isUUID().withMessage("That doesn't look like a valid id").run(req)
     await body("language").isString().not().isEmpty({ignore_whitespace: true}).withMessage("language is required").custom(async language => {
