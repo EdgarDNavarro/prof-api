@@ -2,7 +2,7 @@ import { Currency, DescriptionType, Language, LessonStatuses } from "./enums";
 
 export type UUUID = `${string}-${string}-${string}-${string}-${string}`
 
-export type User = {
+export interface User {
     readonly id: UUUID;
     email: string;
     password: string;

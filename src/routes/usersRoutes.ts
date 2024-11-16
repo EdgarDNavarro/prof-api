@@ -5,7 +5,7 @@ import { verifyToken } from '../jwt/jwt'
 import { validation } from '../middlewares/validation'
 const router = express.Router()
 
-router.get('/', getUsers)
+router.get('/', verifyToken, getUsers)
 router.get('/:id', idMiddleware, validation, getUserById)
 router.post('/', UserMiddleware, validation, registry)
 router.post('/confirm-account', ConfirmMiddleware, validation, confirmAccount)

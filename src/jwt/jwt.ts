@@ -2,6 +2,16 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import 'dotenv/config'
 import { NextFunction, Request, Response } from "express";
 import { respError } from "../utils";
+import { User } from "../types";
+import { findById } from "../services/usersServices";
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: User
+        }
+    }
+}
 
 const secret = process.env.JWT_SECRET as string
 
@@ -17,28 +27,36 @@ const verifyJWT = (token: string) => {
     return jwt.verify(token, secret);
 };
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.get('Authorization');
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization
     if (!authHeader) {
         return res.status(401).json(respError({msg: 'Unauthorized'}))
     }
 
     const token = authHeader.split(' ')[1];
-    let decoded;
+    
     try {
-        decoded = jwt.verify(token, secret);
+        const decoded = jwt.verify(token, secret);
+
+        if (!decoded) {
+            return res.status(401).json(respError({msg: 'Unauthorized'}))
+        }
+    
+        if(typeof decoded === 'object' && decoded.id) {
+            const user = await findById(decoded.id)
+            if(user) {
+                req.user = user
+            } else {
+                return res.status(401).json(respError({msg: 'Unauthorized'}))
+            }
+        }
+        
     } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json(respError({msg: 'Token expired'})) 
         }
         return res.status(401).json(respError({msg: 'Unauthorized'})); 
     }
-
-    if (!decoded) {
-        return res.status(401).json(respError({msg: 'Unauthorized'}))
-    }
-
-    res.locals.user = decoded
     
     next();
 }

@@ -44,7 +44,7 @@ export const ConfirmMiddleware = async (req: Request, res: Response, next: NextF
 }
 
 export const RequestConfirmMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    await body("email").toLowerCase().isEmail().withMessage("that doesn't look like an email").custom(isValidUser).withMessage("This email is already in use").run(req)
+    await body("email").toLowerCase().isEmail().withMessage("that doesn't look like an email").withMessage("This email is already in use").run(req)
   
     next()
 }

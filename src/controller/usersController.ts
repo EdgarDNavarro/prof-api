@@ -218,7 +218,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         // Generamos el access token con duración corta
         const accessToken = sign({ id: user.id, email: user.email }, '1h');
         // Generamos el refresh token con duración más larga
-        const refreshToken = sign({ id: user.id, email: user.email }, '6m');
+        const refreshToken = sign({ id: user.id, email: user.email }, '180d');
 
 
         const userData = {
@@ -236,7 +236,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
             httpOnly: true,     // Evita que sea accesible por JavaScript
             secure: true,       // Asegúrate de usar HTTPS en producción
             sameSite: 'strict', // Protege contra ataques CSRF
-            maxAge: 6 * 30 * 7 * 24 * 60 * 60 * 1000 // 6 meses segun yo
+            maxAge: 6 * 30 * 24 * 60 * 60 * 1000 // 6 meses segun yo
         });
     
         return res.json(respOk({token: accessToken, userData: userData}))

@@ -11,7 +11,6 @@ export const getUsers = async (): Promise<User[]> => {
 export const findById = async (id: UUUID): Promise<User | undefined> => {
     const user = await User.findByPk(id)
     if(user) {
-
         return user
     }
     return undefined
