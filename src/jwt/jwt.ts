@@ -2,13 +2,13 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import 'dotenv/config'
 import { NextFunction, Request, Response } from "express";
 import { respError } from "../utils";
-import { User } from "../types";
 import { findById } from "../services/usersServices";
+import User from "../database/models/Users";
 
 declare global {
     namespace Express {
         interface Request {
-            user?: User
+            user: User
         }
     }
 }
@@ -30,34 +30,34 @@ const verifyJWT = (token: string) => {
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
     if (!authHeader) {
-        return res.status(401).json(respError({msg: 'Unauthorized'}))
+        return res.status(401).json(respError({ msg: 'Unauthorized' }))
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     try {
         const decoded = jwt.verify(token, secret);
 
         if (!decoded) {
-            return res.status(401).json(respError({msg: 'Unauthorized'}))
+            return res.status(401).json(respError({ msg: 'Unauthorized' }))
         }
-    
-        if(typeof decoded === 'object' && decoded.id) {
+
+        if (typeof decoded === 'object' && decoded.id) {
             const user = await findById(decoded.id)
-            if(user) {
-                req.user = user
-            } else {
-                return res.status(401).json(respError({msg: 'Unauthorized'}))
+            if (!user) {
+                return res.status(401).json(respError({ msg: 'Unauthorized' }))
             }
+
+            req.user = user
         }
-        
+
     } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json(respError({msg: 'Token expired'})) 
+            return res.status(401).json(respError({ msg: 'Token expired' }))
         }
-        return res.status(401).json(respError({msg: 'Unauthorized'})); 
+        return res.status(401).json(respError({ msg: 'Unauthorized' }));
     }
-    
+
     next();
 }
 
@@ -70,7 +70,7 @@ const createConfirmedToken = () => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
     return {
         otp,
-        otpToken: jwt.sign({otp}, secret, jwtConfig)
+        otpToken: jwt.sign({ otp }, secret, jwtConfig)
     }
 }
 

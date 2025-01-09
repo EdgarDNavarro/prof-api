@@ -10,7 +10,7 @@ class User extends Model {
     declare id: UserT['id']
     declare email: UserT['email']
     declare password: UserT['password']
-    declare token: UserT['token'] 
+    declare token: UserT['token']
     declare confirmed: UserT['confirmed']
     declare language: UserT['language']
     declare currency: UserT['currency']
@@ -61,17 +61,17 @@ User.init(
         tableName: 'users',
         timestamps: false,
         hooks: {
-            beforeCreate: async function(user:User) {
+            beforeCreate: async function (user: User) {
                 const salt = await bcrypt.genSalt(10)
-                user.password = await bcrypt.hash( user.password, salt )
+                user.password = await bcrypt.hash(user.password, salt)
             }
         }
     }
 )
 
-User.hasOne(Student, {foreignKey: 'user_id'})
+User.hasOne(Student, { foreignKey: 'user_id' })
 Student.belongsTo(User, { foreignKey: 'user_id' });
 
-User.hasOne(Tutor, {foreignKey: 'user_id'})
+User.hasOne(Tutor, { foreignKey: 'user_id' })
 Tutor.belongsTo(User, { foreignKey: 'user_id' });
 export default User
