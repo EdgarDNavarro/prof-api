@@ -7,6 +7,12 @@ import { createConfirmedToken, sign, verifyJWT } from "../jwt/jwt";
 import { AuthEmail } from "../emails/AuthEmail";
 
 export const getUsers = async (req: Request, res: Response) => {
+    if (!req.user.Tutor && !req.user.Student) {
+        res.json(respError(req.user))
+        console.log("Get user");
+
+        return
+    }
     res.json(respOk(req.user))
     return
 }
