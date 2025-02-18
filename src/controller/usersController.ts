@@ -8,7 +8,14 @@ import { AuthEmail } from "../emails/AuthEmail";
 
 export const getUsers = async (req: Request, res: Response) => {
     if (!req.user.Tutor && !req.user.Student) {
-        res.json(respError(req.user))
+        res.json(respError({
+            confirmed: req.user.confirmed,
+            email: req.user.email,
+            currency: req.user.currency,
+            id: req.user.id,
+            language: req.user.language,
+            token: req.user.token
+        }))
         console.log("Get user");
 
         return

@@ -5,7 +5,7 @@ import * as studentsServices from '../services/studentsServices'
 
 
 export const createStudent = async (req: Request, res: Response, next: NextFunction) => {
-    const { user_id, first_name, last_name, phone_number, timezone, photo } = req.body 
+    const { user_id, first_name, last_name, phone_number, timezone, photo } = req.body
     try {
         const newStudentData: NewStudent = {
             user_id,
@@ -15,8 +15,8 @@ export const createStudent = async (req: Request, res: Response, next: NextFunct
             timezone,
             photo
         }
-        const addedStudent = await studentsServices.addStudent(newStudentData)
-        res.json(respOk(addedStudent))
+        await studentsServices.addStudent(newStudentData)
+        res.json(respOk("Created"))
     } catch (error: any) {
         next(error)
     }
@@ -35,7 +35,7 @@ export const getStudentById = async (req: Request, res: Response, next: NextFunc
     try {
         const id = req.params.id as UUUID
         const student = await studentsServices.findStudentById(id)
-        return student ? res.json(respOk(student)) : res.status(404).json(respError({msg: 'Student not found'}))
+        return student ? res.json(respOk(student)) : res.status(404).json(respError({ msg: 'Student not found' }))
     } catch (error: any) {
         next(error)
     }
@@ -45,7 +45,7 @@ export const getStudentByUserId = async (req: Request, res: Response, next: Next
     try {
         const user_id = req.params.user_id as UUUID
         const student = await studentsServices.findStudentByUserId(user_id)
-        return student ? res.json(respOk(student)) : res.status(404).json(respError({msg: 'Student not found'}))
+        return student ? res.json(respOk(student)) : res.status(404).json(respError({ msg: 'Student not found' }))
     } catch (error: any) {
         next(error)
     }
@@ -55,8 +55,8 @@ export const putStudent = async (req: Request, res: Response, next: NextFunction
     const { id, first_name, last_name, phone_number, timezone } = req.body as Student
     try {
         const student = await studentsServices.findStudentById(id)
-        if(!student) {
-            return res.status(404).json(respError({msg: 'Student not found'}))
+        if (!student) {
+            return res.status(404).json(respError({ msg: 'Student not found' }))
         }
         student.set({
             first_name,

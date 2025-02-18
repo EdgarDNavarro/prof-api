@@ -7,7 +7,9 @@ interface IEmail {
 
 export class AuthEmail {
 
-    static sendConfirmationEmail = async (user : IEmail) => {
+    static sendConfirmationEmail = async (user: IEmail) => {
+        console.log(user.token);
+
         const info = await transporter.sendMail({
             from: 'UpTask <admin@uptask.com>',
             to: user.email,
@@ -23,6 +25,6 @@ export class AuthEmail {
         })
 
         console.log('mensaje enviado', info.messageId);
-        
+
     }
 }
