@@ -35,8 +35,8 @@ export const createTutor = async (req: Request, res: Response, next: NextFunctio
             class_price
         }
     
-        const addedTutor = await tutorsServices.addTutor(newTutoData)
-        res.json(respOk(addedTutor))
+        await tutorsServices.addTutor(newTutoData)
+        res.json(respOk("Created"))
     } catch (error: any) {
         next(error)
     }
