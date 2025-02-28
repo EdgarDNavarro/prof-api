@@ -11,15 +11,15 @@ export const createAndUpdateTutorDescription = async (req: Request, res: Respons
 
         const description = await profileService.findDescriptByTypeForTutor(tutor_id, type)
 
-        if(description) {
+        if (description) {
             description.content = content
             await description.save()
-            return res.json(respOk(description))
+            return res.json(respOk("Success"))
         }
-    
-        const addedDescription = await profileService.addTutorDescription(newDescription)
-    
-        res.json(respOk(addedDescription))
+
+        await profileService.addTutorDescription(newDescription)
+
+        res.json(respOk("Success"))
     } catch (error: any) {
         next(error)
     }
@@ -31,7 +31,7 @@ export const getTutorDescriptions = async (req: Request, res: Response, next: Ne
     try {
 
         const descriptions = await profileService.findTutorDescriptionsByTutorId(tutor_id)
-    
+
         res.json(respOk(descriptions))
     } catch (error: any) {
         next(error)

@@ -1,14 +1,28 @@
 import express, { NextFunction, Request, Response } from 'express'
 import Router from './routes/index'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 import { respError } from './utils'
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan'
 import colors from 'colors'
 
+const corsOptions: CorsOptions = {
+    origin: async function (origin, callback) {
+
+        if (!origin || [process.env.FRONTEND_URL].includes(origin) || process.argv[2] === '--api') {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, // Esto permite enviar cookies y encabezados de autenticación
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+};
+
 const app = express()
 app.use(express.json())
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(cookieParser());
 app.use(morgan('dev'))
 
@@ -21,10 +35,10 @@ app.get('/ping', (req, res) => {
 app.use('/api', Router)
 
 app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
-    console.error(err); 
+    console.error(err);
 
     if (res.headersSent) {
-        return next(err); 
+        return next(err);
     }
 
     if (err.name === 'SequelizeForeignKeyConstraintError') {
@@ -38,7 +52,7 @@ app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
         msg: err.message || 'Internal Server Error',
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     }));
-    
+
 })
 
 app.listen(PORT, () => {

@@ -24,7 +24,7 @@ export const createTutor = async (req: Request, res: Response, next: NextFunctio
             user_id,
             first_name,
             last_name,
-            phone_number: phone_number ? phone_number.replace(/\s+/g, '') : undefined,
+            phone_number: phone_number ? phone_number : undefined,
             timezone,
             photo: photo ? photo : undefined,
             bio: bio ? bio : undefined,
@@ -34,7 +34,7 @@ export const createTutor = async (req: Request, res: Response, next: NextFunctio
             years_of_experience,
             class_price
         }
-    
+
         await tutorsServices.addTutor(newTutoData)
         res.json(respOk("Created"))
     } catch (error: any) {
@@ -55,8 +55,8 @@ export const getTutorsById = async (req: Request, res: Response, next: NextFunct
     try {
         const id = req.params.id as Tutor['id']
         const tutor = await tutorsServices.findTutorsById(id)
-        if(!tutor) {
-            return res.status(404).json(respError({msg: 'Tutor not found'}))
+        if (!tutor) {
+            return res.status(404).json(respError({ msg: 'Tutor not found' }))
         }
         res.json(respOk(tutor))
     } catch (error: any) {
@@ -81,16 +81,16 @@ export const putTutor = async (req: Request, res: Response, next: NextFunction) 
         profile_hidden
     } = req.body
     try {
-        const tutor = await tutorsServices.findTutorsById(id)
+        const tutor = await tutorsServices.findOnlyTutorById(id)
 
-        if(!tutor) {
-            return res.status(404).json(respError({msg: "Tutor not found"}))
+        if (!tutor) {
+            return res.status(404).json(respError({ msg: "Tutor not found" }))
         }
 
         tutor.set({
             first_name,
             last_name,
-            phone_number: phone_number ? phone_number.replace(/\s+/g, '') : tutor.phone_number,
+            phone_number: phone_number ? phone_number : tutor.phone_number,
             timezone,
             photo: photo ? photo : tutor.photo,
             bio: bio ? bio : tutor.bio,
@@ -103,7 +103,7 @@ export const putTutor = async (req: Request, res: Response, next: NextFunction) 
         })
 
         await tutor.save()
-        return res.json(respOk(tutor))
+        return res.json(respOk("Update succesfully"))
     } catch (error: any) {
         next(error)
     }
@@ -112,14 +112,34 @@ export const putTutor = async (req: Request, res: Response, next: NextFunction) 
 export const profileVisibility = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params as Pick<Tutor, 'id'>
     try {
-        const tutor = await tutorsServices.findTutorsById(id)
-        
-        if(!tutor) {
-            return res.status(404).json(respError({msg: "Tutor not found"}))
+        const tutor = await tutorsServices.findOnlyTutorById(id)
+
+        if (!tutor) {
+            return res.status(404).json(respError({ msg: "Tutor not found" }))
         }
         tutor.profile_hidden = !tutor.dataValues.profile_hidden
         await tutor.save()
-        return res.json(respOk(tutor))
+        return res.json(respOk("updated"))
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const updateClassPrice = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params as Pick<Tutor, 'id'>
+    const { class_price } = req.body
+    try {
+        const tutor = await tutorsServices.findOnlyTutorById(id)
+
+        if (!tutor) {
+            return res.status(404).json(respError({ msg: "Tutor not found" }))
+        }
+
+        tutor.class_price = class_price
+        console.log(tutor.class_price, class_price);
+
+        await tutor.save()
+        return res.json(respOk("updated"))
     } catch (error) {
         next(error)
     }

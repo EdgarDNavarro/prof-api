@@ -6,6 +6,8 @@ import lessonsRouter from './lessonsRoutes'
 import reviewRouter from './reviewsRoutes'
 import profileRouter from './profileRoutes'
 import studentLevelsRouter from './studentLevelsRoutes'
+import authRouter from './authRoutes'
+import calendarRouter from './calendarRoutes'
 
 const router = express.Router()
 
@@ -16,5 +18,8 @@ router.use('/lessons', lessonsRouter)
 router.use('/reviews', reviewRouter)
 router.use('/profile', profileRouter)
 router.use('/student_level', studentLevelsRouter)
+
+router.use('/auth', authRouter)
+router.use('/calendar', calendarRouter)
 
 export default router
